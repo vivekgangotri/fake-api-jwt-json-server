@@ -4,7 +4,7 @@ const jsonServer = require('json-server')
 const jwt = require('jsonwebtoken')
 
 const server = jsonServer.create()
-const router = jsonServer.router('./database.json')
+const router = jsonServer.router('./data.json')
 const userdb = JSON.parse(fs.readFileSync('./users.json', 'UTF-8'))
 
 server.use(bodyParser.urlencoded({extended: true}))
@@ -13,7 +13,7 @@ server.use(jsonServer.defaults());
 
 const SECRET_KEY = '123456789'
 
-const expiresIn = '1h'
+const expiresIn = '1000h'
 
 // Create a token from a payload 
 function createToken(payload){
@@ -26,7 +26,8 @@ function verifyToken(token){
 }
 
 // Check if the user exists in database
-function isAuthenticated({email, password}){
+function isAuthenticated({email, password}) {
+	// return false;
   return userdb.users.findIndex(user => user.email === email && user.password === password) !== -1
 }
 
@@ -88,7 +89,8 @@ server.post('/auth/login', (req, res) => {
   }
   const access_token = createToken({email, password})
   console.log("Access Token:" + access_token);
-  res.status(200).json({access_token})
+  const message = 'Logged in successfully'
+  res.status(200).json({access_token, message})
 })
 
 server.use(/^(?!\/auth).*$/,  (req, res, next) => {
